@@ -1,0 +1,79 @@
+group = "com.adzvortex.topon_ad_plugin"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" }
+        maven { url "https://jitpack.io" }
+        maven { url "https://android-sdk.is.com" }
+        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.7.3")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" }
+        maven { url "https://jitpack.io" }
+        maven { url "https://android-sdk.is.com" }
+        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    namespace = "com.adzvortex.topon_ad_plugin"
+
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    dependencies {
+        implementation("com.anythink.sdk:core-tpn:6.4.50")
+        implementation("com.anythink.sdk:interstitial-tpn:6.4.50")
+
+        implementation("com.anythink.sdk:adapter-tpn-facebook:6.4.50")
+        implementation("com.facebook.android:audience-network-sdk:6.18.0")
+        implementation("androidx.annotation:annotation:1.0.0")
+        implementation("com.anythink.sdk:adapter-tpn-admob:6.4.50")
+        implementation("com.google.android.gms:play-services-ads:23.6.0")
+        implementation("com.anythink.sdk:adapter-tpn-vungle:6.4.59")
+        implementation("com.vungle:vungle-ads:7.4.3")
+
+        implementation("com.anythink.sdk:adapter-tpn-applovin:6.4.59")
+        implementation("com.applovin:applovin-sdk:13.1.0")
+
+        implementation("com.anythink.sdk:adapter-tpn-mintegral-nonchina:6.4.59")
+        implementation("com.mbridge.msdk.oversea:mbridge_android_sdk:16.9.11")
+        implementation("com.anythink.sdk:tramini-plugin-tpn:6.4.50")
+
+        implementation("androidx.browser:browser:1.8.0")
+        implementation("androidx.appcompat:appcompat:1.7.0")
+        implementation("androidx.core:core-ktx:1.10.1")
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
+}
