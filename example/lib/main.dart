@@ -28,9 +28,9 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   final bool init = await ToponAdPlugin.initializeSdk(
-                    appId: 'h67a9d2765c354',
-                    appKey: '542cf80b0c4c76670548764c45911afc',
-                    placementId: 'n67a9d28bd1a52',
+                    appId: '<APP_ID>',
+                    appKey: '<APP_KEY>',
+                    placementId: '<PLACEMENT_ID>',
                   );
                   setState(() {
                     status =
@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   final bool load = await ToponAdPlugin.loadAd(
-                    placementId: 'n67a9d28bd1a52',
+                    placementId: '<PLACEMENT_ID>',
                   );
                   setState(() {
                     status =
