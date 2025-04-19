@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.gkquizmaster.generalknowledge2025"
+    namespace = "com.topontest.flutter"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.gkquizmaster.generalknowledge2025"
+        applicationId = "com.topontest.flutter"
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

@@ -1,4 +1,4 @@
-package com.gkquizmaster.generalknowledge2025;
+package com.topontest.flutter;
 
 import io.flutter.embedding.android.FlutterActivity;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:topon_ad_plugin/topon_ad_plugin.dart';
+
+import 'helper.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,71 +13,65 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with ToponAdHelper {
   String status = '';
+
+  void updateStatus(Future<String> Function() action) async {
+    final String result = await action();
+    setState(() => status = result);
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('Plugin Example App')),
+        appBar: AppBar(title: const Text('Topon Ads Example')),
         body: Center(
           child: Column(
+            spacing: 15,
             mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 20,
             children: [
               ElevatedButton(
-                onPressed: () async {
-                  final bool init = await ToponAdPlugin.initializeSdk(
-                    appId: '<APP_ID>',
-                    appKey: '<APP_KEY>',
-                    placementId: '<PLACEMENT_ID>',
-                  );
-                  setState(() {
-                    status =
-                        init
-                            ? 'Topon SDK Initialized Successfully'
-                            : 'Topon SDK Initialization Failed';
-                  });
-                },
-                child: Text('Initialize SDK'),
+                onPressed: () => updateStatus(initializeTopon),
+                child: const Text('Initialize SDK'),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  final bool load = await ToponAdPlugin.loadAd(
-                    placementId: '<PLACEMENT_ID>',
-                  );
-                  setState(() {
-                    status =
-                        load ? 'Ads Loaded Successfully' : 'Ads Loaded Failed';
-                  });
-                },
-                child: Text('Load Ads'),
+                onPressed: () => updateStatus(loadInterstitial),
+                child: const Text('Load Interstitial'),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  final bool show = await ToponAdPlugin.showAd();
-                  setState(() {
-                    status = show ? 'Ad Shown Successfully' : 'Ad Shown Failed';
-                  });
-                },
-                child: Text('Show Ads'),
+                onPressed: () => updateStatus(showInterstitial),
+                child: const Text('Show Interstitial'),
               ),
               ElevatedButton(
-                onPressed: () async {
-                  final bool loadBanner = await ToponAdPlugin.loadBanner(
-                    placementId: '<PLACEMENT_ID>',
-                  );
-                  setState(() {
-                    status =
-                        loadBanner
-                            ? 'Banner Shown Successfully'
-                            : 'Banner Shown Failed';
-                  });
-                },
-                child: Text('Show Banner'),
+                onPressed: () => updateStatus(loadRewarded),
+                child: const Text('Load Rewarded'),
               ),
-              Text(status),
+              ElevatedButton(
+                onPressed: () => updateStatus(showRewarded),
+                child: const Text('Show Rewarded'),
+              ),
+              ElevatedButton(
+                onPressed: () => updateStatus(loadBanner),
+                child: const Text('Load Banner'),
+              ),
+              ElevatedButton(
+                onPressed: () => updateStatus(destroyBanner),
+                child: const Text('Destroy Banner'),
+              ),
+              ElevatedButton(
+                onPressed: () => updateStatus(loadSplash),
+                child: const Text('Load Splash'),
+              ),
+              ElevatedButton(
+                onPressed: () => updateStatus(loadNative),
+                child: const Text('Load Native'),
+              ),
+              ElevatedButton(
+                onPressed: () => updateStatus(showNative),
+                child: const Text('Show Native'),
+              ),
+              Text(status, style: const TextStyle(fontSize: 16)),
             ],
           ),
         ),

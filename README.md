@@ -1,6 +1,6 @@
 # 📦 ToponAdPlugin (Flutter)
 
-A lightweight Flutter plugin to integrate TopOn Ads via method channels. Supports initializing the SDK and handling Interstitial & Banner ads with ease.
+A lightweight Flutter plugin to integrate TopOn Ads via method channels. Supports initializing the SDK and handling Interstitial, Rewarded, Native, Banner, and Splash ads with ease.
 
 ---
 
@@ -8,7 +8,10 @@ A lightweight Flutter plugin to integrate TopOn Ads via method channels. Support
 
 - ✅ Initialize TopOn SDK  
 - ✅ Load and Show Interstitial Ads  
+- ✅ Load and Show Rewarded Ads  
+- ✅ Load and Show Native Ads  
 - ✅ Load Banner Ads  
+- ✅ Load Splash Ads  
 
 ---
 
@@ -44,40 +47,70 @@ dependencies:
 final success = await ToponAdPlugin.initializeSdk(
   appId: 'your_app_id',
   appKey: 'your_app_key',
-  placementId: 'your_placement_id',
 );
 ```
 
 ---
 
-### 2️⃣ Load and Show Interstitial Ad
+### 2️⃣ Interstitial Ads
 
 ```dart
-await ToponAdPlugin.loadAd(placementId: 'your_placement_id');
-
-final shown = await ToponAdPlugin.showAd();
+await ToponAdPlugin.loadInterstitialAd(placementId: 'your_interstitial_id');
+final shown = await ToponAdPlugin.showInterstitialAd();
 ```
 
 ---
 
-### 3️⃣ Load Banner Ad
+### 3️⃣ Rewarded Ads
 
 ```dart
-await ToponAdPlugin.loadBanner(placementId: 'your_banner_placement_id');
+await ToponAdPlugin.loadRewardedAd(placementId: 'your_rewarded_id');
+final shown = await ToponAdPlugin.showRewardedAd();
+```
+
+---
+
+### 4️⃣ Native Ads
+
+```dart
+await ToponAdPlugin.loadNativeAd(placementId: 'your_native_id');
+final shown = await ToponAdPlugin.showNativeAd();
+```
+
+---
+
+### 5️⃣ Banner Ad
+
+```dart
+await ToponAdPlugin.loadBannerAd(placementId: 'your_banner_id');
 ```
 
 > You need to handle the platform view part natively for displaying the banner.
 
 ---
 
+### 6️⃣ Splash Ad
+
+```dart
+await ToponAdPlugin.loadSplashAd(placementId: 'your_splash_id');
+```
+
+---
+
 ## 📄 Method Summary
 
-| Method              | Description                          |
-|---------------------|--------------------------------------|
-| `initializeSdk()`   | Initializes TopOn SDK                |
-| `loadAd()`          | Loads interstitial ad                |
-| `showAd()`          | Shows the loaded interstitial ad     |
-| `loadBanner()`      | Loads a banner ad                    |
+| Method                     | Description                          |
+|---------------------------|--------------------------------------|
+| `initializeSdk()`         | Initializes TopOn SDK                |
+| `loadInterstitialAd()`    | Loads interstitial ad                |
+| `showInterstitialAd()`    | Shows the loaded interstitial ad     |
+| `loadRewardedAd()`        | Loads rewarded ad                    |
+| `showRewardedAd()`        | Shows the rewarded ad                |
+| `loadNativeAd()`          | Loads native ad                      |
+| `showNativeAd()`          | Shows native ad                      |
+| `loadBannerAd()`          | Loads banner ad                      |
+| `destroyBannerAd()`       | Destroys banner ad                   |
+| `loadSplashAd()`          | Loads splash ad                      |
 
 ---
 
@@ -92,7 +125,6 @@ class ToponAdPlugin {
   static Future<bool> initializeSdk({
     required String appId,
     required String appKey,
-    required String placementId,
   }) async {
     try {
       return await _channel.invokeMethod('initializeSdk', {
@@ -104,9 +136,9 @@ class ToponAdPlugin {
     }
   }
 
-  static Future<bool> loadAd({required String placementId}) async {
+  static Future<bool> loadInterstitialAd({required String placementId}) async {
     try {
-      return await _channel.invokeMethod('loadAd', {
+      return await _channel.invokeMethod('loadInterstitialAd', {
         'placementId': placementId,
       });
     } catch (e) {
@@ -114,17 +146,71 @@ class ToponAdPlugin {
     }
   }
 
-  static Future<bool> showAd() async {
+  static Future<bool> showInterstitialAd() async {
     try {
-      return await _channel.invokeMethod('showAd');
+      return await _channel.invokeMethod('showInterstitialAd');
     } catch (e) {
       return false;
     }
   }
 
-  static Future<bool> loadBanner({required String placementId}) async {
+  static Future<bool> loadRewardedAd({required String placementId}) async {
     try {
-      return await _channel.invokeMethod('loadBanner', {
+      return await _channel.invokeMethod('loadRewardedAd', {
+        'placementId': placementId,
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> showRewardedAd() async {
+    try {
+      return await _channel.invokeMethod('showRewardedAd');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> loadNativeAd({required String placementId}) async {
+    try {
+      return await _channel.invokeMethod('loadNativeAd', {
+        'placementId': placementId,
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> showNativeAd() async {
+    try {
+      return await _channel.invokeMethod('showNativeAd');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> loadBannerAd({required String placementId}) async {
+    try {
+      return await _channel.invokeMethod('loadBannerAd', {
+        'placementId': placementId,
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> destroyBannerAd() async {
+    try {
+      return await _channel.invokeMethod('destroyBannerAd');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> loadSplashAd({required String placementId}) async {
+    try {
+      return await _channel.invokeMethod('loadSplashAd', {
         'placementId': placementId,
       });
     } catch (e) {
@@ -138,12 +224,18 @@ class ToponAdPlugin {
 
 ## 📞 MethodChannel Mapping (Native Side)
 
-| Dart Method     | Android Native Call       |
-|----------------|----------------------------|
-| `initializeSdk` | Initialize TopOn SDK      |
-| `loadAd`        | Load Interstitial Ad      |
-| `showAd`        | Show Loaded Interstitial  |
-| `loadBanner`    | Load and Display Banner   |
+| Dart Method           | Android Native Call       |
+|----------------------|----------------------------|
+| `initializeSdk`       | Initialize TopOn SDK      |
+| `loadInterstitialAd`  | Load Interstitial Ad      |
+| `showInterstitialAd`  | Show Interstitial Ad      |
+| `loadRewardedAd`      | Load Rewarded Ad          |
+| `showRewardedAd`      | Show Rewarded Ad          |
+| `loadNativeAd`        | Load Native Ad            |
+| `showNativeAd`        | Show Native Ad            |
+| `loadBannerAd`        | Load Banner Ad            |
+| `destroyBannerAd`     | Destroy Banner Ad         |
+| `loadSplashAd`        | Load Splash Ad            |
 
 ---
 

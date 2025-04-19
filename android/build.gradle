@@ -1,4 +1,4 @@
-group = "com.adzvortex.topon_ad_plugin"
+group = "com.sudeep.topon_ad_plugin"
 version = "1.0"
 
 buildscript {
@@ -6,9 +6,6 @@ buildscript {
         google()
         mavenCentral()
         maven { url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" }
-        maven { url "https://jitpack.io" }
-        maven { url "https://android-sdk.is.com" }
-        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
     }
 
     dependencies {
@@ -21,16 +18,13 @@ rootProject.allprojects {
         google()
         mavenCentral()
         maven { url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" }
-        maven { url "https://jitpack.io" }
-        maven { url "https://android-sdk.is.com" }
-        maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
     }
 }
 
 apply plugin: "com.android.library"
 
 android {
-    namespace = "com.adzvortex.topon_ad_plugin"
+    namespace = "com.sudeep.topon_ad_plugin"
 
     compileSdk = 35
 
@@ -44,28 +38,14 @@ android {
     }
 
     dependencies {
-
-        implementation("com.anythink.sdk:adapter-tpn-facebook:6.4.50")
-        implementation("com.facebook.android:audience-network-sdk:6.18.0")
-        implementation("androidx.annotation:annotation:1.0.0")
-        implementation("com.anythink.sdk:adapter-tpn-admob:6.4.50")
-        implementation("com.google.android.gms:play-services-ads:23.6.0")
-        implementation("com.anythink.sdk:adapter-tpn-vungle:6.4.59")
-        implementation("com.vungle:vungle-ads:7.4.3")
-
-        implementation("com.anythink.sdk:adapter-tpn-applovin:6.4.59")
-        implementation("com.applovin:applovin-sdk:13.1.0")
-
-        implementation("com.anythink.sdk:adapter-tpn-mintegral-nonchina:6.4.59")
-        implementation("com.anythink.sdk:tramini-plugin-tpn:6.4.50")
-
-        implementation("androidx.browser:browser:1.8.0")
+        implementation("com.thinkup.sdk:core-tpn:6.4.75")
+        implementation ("com.thinkup.sdk:nativead-tpn:6.4.75")
+        implementation("com.thinkup.sdk:banner-tpn:6.4.75")
+        implementation("com.thinkup.sdk:interstitial-tpn:6.4.75")
+        implementation("com.thinkup.sdk:rewardedvideo-tpn:6.4.75")
+        implementation("com.thinkup.sdk:splash-tpn:6.4.75")
         implementation("androidx.appcompat:appcompat:1.7.0")
-        implementation("androidx.core:core-ktx:1.10.1")
-        implementation("androidx.multidex:multidex:2.0.1")
-        implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
-        implementation("com.anythink.sdk:core-tpn:6.4.50")
-        implementation("com.anythink.sdk:interstitial-tpn:6.4.50")
+        implementation("androidx.browser:browser:1.8.0")
     }
 
     testOptions {
