@@ -1,11 +1,20 @@
 name: topon_ad_plugin
-description: "A new Flutter project."
+description: A Flutter plugin for integrating TopOn Ads using Method Channels. Supports interstitial, rewarded, banner, native, and splash ads.
 version: 0.0.1
-homepage:
+homepage: https://github.com/jaiswal4sudeep/ToponAdPlugin
+repository: https://github.com/jaiswal4sudeep/ToponAdPlugin
+issue_tracker: https://github.com/jaiswal4sudeep/ToponAdPlugin/issues
+documentation: https://github.com/jaiswal4sudeep/ToponAdPlugin#readme
+topics:
+  - ads
+  - topon
+  - interstitial
+  - rewarded
+  - monetization
 
 environment:
   sdk: ^3.7.0
-  flutter: '>=3.3.0'
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
@@ -15,7 +24,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^3.0.1
 
 flutter:
   plugin:
