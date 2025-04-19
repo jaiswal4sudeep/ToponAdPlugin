@@ -24,7 +24,7 @@ Add this plugin to your `pubspec.yaml` file:
 ```yaml
 dependencies:
   topon_ad_plugin:
-    path: https://github.com/jaiswal4sudeep/ToponAdPlugin
+    path: https://github.com/jaiswal4sudeep/ToponAdPlugin.git
 ```
 
 ---

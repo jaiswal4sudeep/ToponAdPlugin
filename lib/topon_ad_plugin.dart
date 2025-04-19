@@ -1,9 +1,12 @@
 import 'package:flutter/services.dart';
 
+/// A Flutter plugin for displaying TopOn Ads using platform channels.
 class ToponAdPlugin {
   static const MethodChannel _channel = MethodChannel('topon_ad_plugin');
 
-  //! Initialize TopOn SDK
+  /// Initializes the TopOn SDK with [appId] and [appKey].
+  ///
+  /// Returns `true` if the SDK was initialized successfully, else `false`.
   static Future<bool> initializeSdk({
     required String appId,
     required String appKey,
@@ -18,7 +21,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Load Interstitial Ad
+  /// Loads an interstitial ad using the given [placementId].
   static Future<bool> loadInterstitialAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadInterstitialAd', {
@@ -29,7 +32,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Show Interstitial Ad
+  /// Shows a loaded interstitial ad.
   static Future<bool> showInterstitialAd() async {
     try {
       return await _channel.invokeMethod('showInterstitial');
@@ -38,7 +41,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Load Splash Ad
+  /// Loads a splash ad with the given [placementId].
   static Future<bool> loadSplashAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadSplashAd', {
@@ -49,7 +52,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Load Banner Ad
+  /// Loads a banner ad with the given [placementId].
   static Future<bool> loadBannerAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadBannerAd', {
@@ -60,7 +63,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Destroy Banner Ad
+  /// Destroys any loaded banner ads.
   static Future<bool> destroyBannerAd() async {
     try {
       return await _channel.invokeMethod('destroyBannerAd');
@@ -69,7 +72,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Load Native Ad
+  /// Loads a native ad with the given [placementId].
   static Future<bool> loadNativeAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadNativeAd', {
@@ -80,7 +83,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Show Native Ad
+  /// Displays a previously loaded native ad.
   static Future<bool> showNativeAd() async {
     try {
       return await _channel.invokeMethod('showNativeAd');
@@ -89,7 +92,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Load Rewarded Video Ad
+  /// Loads a rewarded video ad with the given [placementId].
   static Future<bool> loadRewardedAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadRewardedAd', {
@@ -100,7 +103,7 @@ class ToponAdPlugin {
     }
   }
 
-  //! Show Rewarded Video Ad
+  /// Shows a previously loaded rewarded video ad.
   static Future<bool> showRewardedAd() async {
     try {
       return await _channel.invokeMethod('showRewardedAd');
