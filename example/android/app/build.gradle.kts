@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.qrscanner.quickscan"
+    namespace = "com.gkquizmaster.generalknowledge2025"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.qrscanner.quickscan"
+        applicationId = "com.gkquizmaster.generalknowledge2025"
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

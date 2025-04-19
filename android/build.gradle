@@ -44,8 +44,6 @@ android {
     }
 
     dependencies {
-        implementation("com.anythink.sdk:core-tpn:6.4.50")
-        implementation("com.anythink.sdk:interstitial-tpn:6.4.50")
 
         implementation("com.anythink.sdk:adapter-tpn-facebook:6.4.50")
         implementation("com.facebook.android:audience-network-sdk:6.18.0")
@@ -59,12 +57,15 @@ android {
         implementation("com.applovin:applovin-sdk:13.1.0")
 
         implementation("com.anythink.sdk:adapter-tpn-mintegral-nonchina:6.4.59")
-        implementation("com.mbridge.msdk.oversea:mbridge_android_sdk:16.9.11")
         implementation("com.anythink.sdk:tramini-plugin-tpn:6.4.50")
 
         implementation("androidx.browser:browser:1.8.0")
         implementation("androidx.appcompat:appcompat:1.7.0")
         implementation("androidx.core:core-ktx:1.10.1")
+        implementation("androidx.multidex:multidex:2.0.1")
+        implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
+        implementation("com.anythink.sdk:core-tpn:6.4.50")
+        implementation("com.anythink.sdk:interstitial-tpn:6.4.50")
     }
 
     testOptions {

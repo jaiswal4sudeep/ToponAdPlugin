@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 onPressed: () async {
                   final bool loadBanner = await ToponAdPlugin.loadBanner(
-                    placementId: 'n67e3c8bf72ac6',
+                    placementId: '<PLACEMENT_ID>',
                   );
                   setState(() {
                     status =
