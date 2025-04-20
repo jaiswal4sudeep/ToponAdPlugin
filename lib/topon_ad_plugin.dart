@@ -1,12 +1,28 @@
 import 'package:flutter/services.dart';
 
 /// A Flutter plugin for displaying TopOn Ads using platform channels.
+///
+/// This plugin supports various ad formats such as interstitial,
+/// rewarded video, splash, banner, and native ads. It also allows listening
+/// to ad lifecycle events from the native side.
 class ToponAdPlugin {
   static const MethodChannel _channel = MethodChannel('topon_ad_plugin');
 
-  /// Initializes the TopOn SDK with [appId] and [appKey].
+  /// Callback to listen to native ad events.
   ///
-  /// Returns `true` if the SDK was initialized successfully, else `false`.
+  /// Example:
+  /// ```dart
+  /// ToponAdPlugin.onEvent = (method, arguments) {
+  ///   if (method == 'onRewardedAdCompleted') {
+  ///     // Reward the user
+  ///   }
+  /// };
+  /// ```
+  static void Function(String method, dynamic arguments)? onEvent;
+
+  /// Initializes the TopOn SDK with the given [appId] and [appKey].
+  ///
+  /// Returns `true` if initialization is successful, otherwise `false`.
   static Future<bool> initializeSdk({
     required String appId,
     required String appKey,
@@ -21,7 +37,18 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads an interstitial ad using the given [placementId].
+  /// Sets up a listener to receive ad events from the native side.
+  ///
+  /// Call this once during app startup before loading or showing any ads.
+  static void setUpListeners() {
+    _channel.setMethodCallHandler((MethodCall call) async {
+      if (onEvent != null) {
+        onEvent!(call.method, call.arguments);
+      }
+    });
+  }
+
+  /// Loads an interstitial ad for the provided [placementId].
   static Future<bool> loadInterstitialAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadInterstitialAd', {
@@ -32,7 +59,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Shows a loaded interstitial ad.
+  /// Shows a previously loaded interstitial ad.
   static Future<bool> showInterstitialAd() async {
     try {
       return await _channel.invokeMethod('showInterstitial');
@@ -41,7 +68,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a splash ad with the given [placementId].
+  /// Loads a splash ad for the provided [placementId].
   static Future<bool> loadSplashAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadSplashAd', {
@@ -52,7 +79,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a banner ad with the given [placementId].
+  /// Loads a banner ad for the provided [placementId].
   static Future<bool> loadBannerAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadBannerAd', {
@@ -63,7 +90,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Destroys any loaded banner ads.
+  /// Destroys any currently displayed banner ad.
   static Future<bool> destroyBannerAd() async {
     try {
       return await _channel.invokeMethod('destroyBannerAd');
@@ -72,7 +99,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a native ad with the given [placementId].
+  /// Loads a native ad for the provided [placementId].
   static Future<bool> loadNativeAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadNativeAd', {
@@ -92,7 +119,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a rewarded video ad with the given [placementId].
+  /// Loads a rewarded video ad for the provided [placementId].
   static Future<bool> loadRewardedAd({required String placementId}) async {
     try {
       return await _channel.invokeMethod('loadRewardedAd', {

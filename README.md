@@ -14,6 +14,7 @@ A lightweight Flutter plugin to integrate [TopOn Ads](https://www.toponad.com/) 
 - ✅ Load & Show Native Ads  
 - ✅ Load Banner Ads  
 - ✅ Load Splash Ads  
+- ✅ Listen to Ad Events  
 
 ---
 
@@ -42,6 +43,18 @@ dependencies:
 ---
 
 ## 🧑‍💻 Usage
+
+### 0️⃣ Set Up Ad Event Listeners (Optional)
+
+Call this once during app startup to listen to ad lifecycle events from native code.
+
+```dart
+ToponAdPlugin.setUpListeners((event, args) {
+  print('Ad Event: $event, Data: $args');
+});
+```
+
+---
 
 ### 1️⃣ Initialize SDK
 

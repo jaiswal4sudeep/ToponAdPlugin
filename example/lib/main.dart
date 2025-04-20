@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:topon_ad_plugin/topon_ad_plugin.dart';
 
 import 'helper.dart';
 
@@ -19,6 +22,15 @@ class _MyAppState extends State<MyApp> with ToponAdHelper {
   void updateStatus(Future<String> Function() action) async {
     final String result = await action();
     setState(() => status = result);
+  }
+
+  @override
+  void initState() {
+    ToponAdPlugin.setUpListeners();
+    ToponAdPlugin.onEvent = (method, args) {
+      log('TopOn Event: $method | Args: $args');
+    };
+    super.initState();
   }
 
   @override

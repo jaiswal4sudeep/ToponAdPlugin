@@ -91,12 +91,19 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     }
   }
 
+  private void sendEventToDart(String method, Object arguments) {
+    if (channel != null && activity != null) {
+      activity.runOnUiThread(() -> channel.invokeMethod(method, arguments));
+    }
+  }
+
   private void initSdk(MethodCall call, Result result) {
     Map<String, Object> args = call.arguments();
     String appId = (String) args.get("appId");
     String appKey = (String) args.get("appKey");
 
     TUSDK.init(context, appId, appKey);
+    Log.d(TAG, "SDK initialized successfully");
     result.success(true);
   }
 
@@ -107,43 +114,51 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     interstitialAd.setAdListener(new TUInterstitialListener() {
       @Override
       public void onInterstitialAdLoaded() {
-        Log.d(TAG, "Interstitial loaded.");
+        Log.d(TAG, "Interstitial ad loaded");
+        sendEventToDart("onInterstitialAdLoaded", null);
       }
 
       @Override
       public void onInterstitialAdLoadFail(AdError adError) {
-        Log.e(TAG, "Interstitial Error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Interstitial ad load failed");
+        sendEventToDart("onInterstitialAdLoadFail", adError.getFullErrorInfo());
       }
 
       @Override
       public void onInterstitialAdClicked(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Interstitial clicked.");
+        Log.d(TAG, "Interstitial ad clicked");
+        sendEventToDart("onInterstitialAdClicked", tuAdInfo.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdShow(TUAdInfo info) {
-        Log.d(TAG, "Interstitial shown.");
+        Log.d(TAG, "Interstitial ad shown");
+        sendEventToDart("onInterstitialAdShow", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdClose(TUAdInfo info) {
-        Log.d(TAG, "Interstitial closed.");
+        Log.d(TAG, "Interstitial ad closed");
+        sendEventToDart("onInterstitialAdClose", info.getPlacementId());
         loadInterstitialAd(call, result);
       }
 
       @Override
       public void onInterstitialAdVideoStart(TUAdInfo info) {
-        Log.d(TAG, "Interstitial video started.");
+        Log.d(TAG, "Interstitial ad video started");
+        sendEventToDart("onInterstitialAdVideoStart", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdVideoEnd(TUAdInfo info) {
-        Log.d(TAG, "Interstitial video ended.");
+        Log.d(TAG, "Interstitial ad video ended");
+        sendEventToDart("onInterstitialAdVideoEnd", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdVideoError(AdError adError) {
-        Log.e(TAG, "Interstitial video error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Interstitial ad video error");
+        sendEventToDart("onInterstitialAdVideoError", adError.getFullErrorInfo());
       }
     });
 
@@ -154,9 +169,9 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void showInterstitial(Result result) {
     if (interstitialAd != null && interstitialAd.isAdReady()) {
       interstitialAd.show(activity);
+      Log.d(TAG, "Interstitial ad shown");
       result.success(true);
     } else {
-      Log.w(TAG, "Interstitial ad not ready.");
       result.success(false);
     }
   }
@@ -167,6 +182,9 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     splashAd = new TUSplashAd(context, placementId, new TUSplashAdEZListener() {
       @Override
       public void onAdLoaded() {
+        Log.d(TAG, "Splash ad loaded");
+        sendEventToDart("onSplashAdLoaded", null);
+
         if (splashAd.isAdReady()) {
           activity.runOnUiThread(() -> {
             FrameLayout splashContainer = new FrameLayout(activity);
@@ -177,33 +195,36 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
 
             ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
             decorView.addView(splashContainer);
-
             splashAd.show(activity, splashContainer);
           });
-          Log.d(TAG, "Splash Ad loaded.");
-        }else {
+        } else {
+          Log.d(TAG, "Splash ad not ready, loading again");
           splashAd.loadAd();
         }
       }
 
       @Override
       public void onNoAdError(AdError adError) {
-        Log.e(TAG, "Splash Ad Error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Splash ad no ad error");
+        sendEventToDart("onSplashAdError", adError.getFullErrorInfo());
       }
 
       @Override
       public void onAdShow(TUAdInfo entity) {
-        Log.d(TAG, "Splash Ad shown.");
+        Log.d(TAG, "Splash ad shown");
+        sendEventToDart("onSplashAdShow", entity.getPlacementId());
       }
 
       @Override
       public void onAdClick(TUAdInfo entity) {
-        Log.d(TAG, "Splash Ad clicked.");
+        Log.d(TAG, "Splash ad clicked");
+        sendEventToDart("onSplashAdClick", entity.getPlacementId());
       }
 
       @Override
       public void onAdDismiss(TUAdInfo entity, TUSplashAdExtraInfo extra) {
-        Log.d(TAG, "Splash Ad dismissed.");
+        Log.d(TAG, "Splash ad dismissed");
+        sendEventToDart("onSplashAdDismiss", entity.getPlacementId());
       }
     });
 
@@ -226,40 +247,47 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     bannerView.setBannerAdListener(new TUBannerListener() {
       @Override
       public void onBannerLoaded() {
-        Log.d(TAG, "Banner loaded.");
+        Log.d(TAG, "Banner ad loaded");
+        sendEventToDart("onBannerLoaded", null);
       }
 
       @Override
       public void onBannerFailed(AdError adError) {
-        Log.e(TAG, "Banner Error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Banner ad failed");
+        sendEventToDart("onBannerFailed", adError.getFullErrorInfo());
       }
 
       @Override
-      public void onBannerClicked(TUAdInfo TUAdInfo) {
-        Log.d(TAG, "Banner clicked.");
+      public void onBannerClicked(TUAdInfo tuAdInfo) {
+        Log.d(TAG, "Banner ad clicked");
+        sendEventToDart("onBannerClicked", tuAdInfo.getPlacementId());
       }
 
       @Override
-      public void onBannerShow(TUAdInfo TUAdInfo) {
-        Log.d(TAG, "Banner shown.");
+      public void onBannerShow(TUAdInfo tuAdInfo) {
+        Log.d(TAG, "Banner ad shown");
+        sendEventToDart("onBannerShow", tuAdInfo.getPlacementId());
       }
 
       @Override
-      public void onBannerClose(TUAdInfo TUAdInfo) {
+      public void onBannerClose(TUAdInfo tuAdInfo) {
+        Log.d(TAG, "Banner ad closed");
+        sendEventToDart("onBannerClose", tuAdInfo.getPlacementId());
         if (bannerView.getParent() != null) {
           ((ViewGroup) bannerView.getParent()).removeView(bannerView);
         }
-        Log.d(TAG, "Banner closed.");
       }
 
       @Override
-      public void onBannerAutoRefreshed(TUAdInfo TUAdInfo) {
-        Log.d(TAG, "Banner refreshed.");
+      public void onBannerAutoRefreshed(TUAdInfo tuAdInfo) {
+        Log.d(TAG, "Banner ad auto refreshed");
+        sendEventToDart("onBannerAutoRefreshed", tuAdInfo.getPlacementId());
       }
 
       @Override
       public void onBannerAutoRefreshFail(AdError adError) {
-        Log.e(TAG, "Banner refresh error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Banner ad auto refresh failed");
+        sendEventToDart("onBannerAutoRefreshFail", adError.getFullErrorInfo());
       }
     });
 
@@ -270,6 +298,7 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void destroyBannerAd(Result result) {
     if (bannerView != null) {
       bannerView.destroy();
+      Log.d(TAG, "Banner ad destroyed");
       bannerView = null;
     }
     result.success(true);
@@ -281,12 +310,14 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     tuNative = new TUNative(context, placementId, new TUNativeNetworkListener() {
       @Override
       public void onNativeAdLoaded() {
-        Log.d(TAG, "Native ad loaded.");
+        Log.d(TAG, "Native ad loaded");
+        sendEventToDart("onNativeAdLoaded", null);
       }
 
       @Override
       public void onNativeAdLoadFail(AdError adError) {
-        Log.e(TAG, "Native ad error: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Native ad load failed");
+        sendEventToDart("onNativeAdLoadFail", adError.getFullErrorInfo());
       }
     });
 
@@ -297,10 +328,10 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void showNativeAd(Result result) {
     nativeAd = tuNative.getNativeAd();
     if (nativeAd != null && nativeAd.isNativeExpress()) {
-      Log.d(TAG, "Native ad is ready to show.");
+      Log.d(TAG, "Native ad shown");
+      sendEventToDart("onNativeAdReadyToShow", nativeAd.getAdInfo().getPlacementId());
       result.success(true);
     } else {
-      Log.w(TAG, "Native ad not ready.");
       result.success(false);
     }
   }
@@ -312,42 +343,50 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     rewardedVideoAd.setAdListener(new TURewardVideoListener() {
       @Override
       public void onRewardedVideoAdLoaded() {
-        Log.d(TAG, "Rewarded Ad loaded.");
+        Log.d(TAG, "Rewarded video ad loaded");
+        sendEventToDart("onRewardedVideoAdLoaded", null);
       }
 
       @Override
       public void onRewardedVideoAdFailed(AdError adError) {
-        Log.e(TAG, "Rewarded Ad load failed: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Rewarded video ad failed");
+        sendEventToDart("onRewardedVideoAdFailed", adError.getFullErrorInfo());
       }
 
       @Override
       public void onRewardedVideoAdPlayStart(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded Ad started.");
+        Log.d(TAG, "Rewarded video ad play started");
+        sendEventToDart("onRewardedVideoAdPlayStart", adInfo.getPlacementId());
       }
 
       @Override
       public void onRewardedVideoAdPlayEnd(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded Ad ended.");
+        Log.d(TAG, "Rewarded video ad play ended");
+        sendEventToDart("onRewardedVideoAdPlayEnd", adInfo.getPlacementId());
       }
 
       @Override
       public void onRewardedVideoAdPlayFailed(AdError adError, TUAdInfo adInfo) {
-        Log.e(TAG, "Rewarded Ad play failed: " + adError.getFullErrorInfo());
+        Log.d(TAG, "Rewarded video ad play failed");
+        sendEventToDart("onRewardedVideoAdPlayFailed", adError.getFullErrorInfo());
       }
 
       @Override
       public void onRewardedVideoAdClosed(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded Ad closed.");
+        Log.d(TAG, "Rewarded video ad closed");
+        sendEventToDart("onRewardedVideoAdClosed", adInfo.getPlacementId());
       }
 
       @Override
       public void onRewardedVideoAdPlayClicked(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Rewarded Ad clicked.");
+        Log.d(TAG, "Rewarded video ad play clicked");
+        sendEventToDart("onRewardedVideoAdPlayClicked", tuAdInfo.getPlacementId());
       }
 
       @Override
       public void onReward(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "User should be rewarded.");
+        Log.d(TAG, "Rewarded video ad rewarded");
+        sendEventToDart("onReward", tuAdInfo.getPlacementId());
       }
     });
 
@@ -358,9 +397,9 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void showRewardedAd(Result result) {
     if (rewardedVideoAd != null && rewardedVideoAd.isAdReady()) {
       rewardedVideoAd.show(activity);
+      Log.d(TAG, "Rewarded video ad shown");
       result.success(true);
     } else {
-      Log.w(TAG, "Rewarded ad not ready.");
       result.success(false);
     }
   }
