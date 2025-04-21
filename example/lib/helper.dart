@@ -36,13 +36,16 @@ mixin ToponAdHelper {
   }
 
   Future<String> loadBanner() async {
-    final result = await ToponAdPlugin.loadBannerAd(placementId: bannerId);
+    final result = await ToponAdPlugin.loadBannerAd(
+      placementId: bannerId,
+      position: BannerPosition.bottom,
+    );
     return result ? 'Banner Ad Loaded' : 'Banner Ad Load Failed';
   }
 
-  Future<String> destroyBanner() async {
-    final result = await ToponAdPlugin.destroyBannerAd();
-    return result ? 'Banner Ad Destroyed' : 'Banner Ad Destroy Failed';
+  Future<String> removeBanner() async {
+    final result = await ToponAdPlugin.removeBannerAd();
+    return result ? 'Banner Ad removed' : 'Banner Ad Remove Failed';
   }
 
   Future<String> loadNative() async {

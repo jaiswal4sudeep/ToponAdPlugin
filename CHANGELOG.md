@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.0.4] - 2025-04-20
+
+### 🛠️ Fixed
+- Resolved crash due to re-adding banner view (`IllegalStateException: The specified child already has a parent`).
+- Banner ads now properly recreate `TUBannerView` and handle removal/reloading without errors.
+
+---
+
 ## [0.0.3] - 2025-04-20
 
 ### ✨ Added

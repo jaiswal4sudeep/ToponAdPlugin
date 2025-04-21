@@ -68,8 +68,8 @@ class _MyAppState extends State<MyApp> with ToponAdHelper {
                 child: const Text('Load Banner'),
               ),
               ElevatedButton(
-                onPressed: () => updateStatus(destroyBanner),
-                child: const Text('Destroy Banner'),
+                onPressed: () => updateStatus(removeBanner),
+                child: const Text('Remove Banner'),
               ),
               ElevatedButton(
                 onPressed: () => updateStatus(loadSplash),

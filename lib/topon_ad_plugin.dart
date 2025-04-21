@@ -79,21 +79,25 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a banner ad for the provided [placementId].
-  static Future<bool> loadBannerAd({required String placementId}) async {
+  /// Loads a banner ad for the provided [placementId] at given [position].
+  static Future<bool> loadBannerAd({
+    required String placementId,
+    required BannerPosition position,
+  }) async {
     try {
       return await _channel.invokeMethod('loadBannerAd', {
         'placementId': placementId,
+        'position': position.name,
       });
     } catch (e) {
       return false;
     }
   }
 
-  /// Destroys any currently displayed banner ad.
-  static Future<bool> destroyBannerAd() async {
+  /// Removes any currently displayed banner ad.
+  static Future<bool> removeBannerAd() async {
     try {
-      return await _channel.invokeMethod('destroyBannerAd');
+      return await _channel.invokeMethod('removeBannerAd');
     } catch (e) {
       return false;
     }
@@ -139,3 +143,5 @@ class ToponAdPlugin {
     }
   }
 }
+
+enum BannerPosition { top, bottom }

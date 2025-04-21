@@ -3,6 +3,8 @@ package com.sudeep.topon_ad_plugin;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -40,6 +42,7 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private TUInterstitial interstitialAd;
   private TUSplashAd splashAd;
   private TUBannerView bannerView;
+  private FrameLayout bannerContainer;
   private TUNative tuNative;
   private NativeAd nativeAd;
   private TURewardVideoAd rewardedVideoAd;
@@ -71,8 +74,8 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
       case "loadBannerAd":
         loadBannerAd(call, result);
         break;
-      case "destroyBannerAd":
-        destroyBannerAd(result);
+      case "removeBannerAd":
+        removeBannerAd(result);
         break;
       case "loadNativeAd":
         loadNativeAd(call, result);
@@ -234,74 +237,115 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
 
   private void loadBannerAd(MethodCall call, Result result) {
     String placementId = call.argument("placementId");
+    String position = call.argument("position");
 
-    if (bannerView != null) bannerView.destroy();
+    if(bannerView == null){
+      bannerView = new TUBannerView(activity);
+      bannerView.setPlacementId(placementId);
 
-    bannerView = new TUBannerView(activity);
-    bannerView.setPlacementId(placementId);
-    bannerView.setLayoutParams(new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-    ));
+      int width = activity.getResources().getDisplayMetrics().widthPixels;
+      int height = ViewGroup.LayoutParams.WRAP_CONTENT;
+      bannerView.setLayoutParams(new FrameLayout.LayoutParams(width, height));
 
-    bannerView.setBannerAdListener(new TUBannerListener() {
-      @Override
-      public void onBannerLoaded() {
-        Log.d(TAG, "Banner ad loaded");
-        sendEventToDart("onBannerLoaded", null);
-      }
-
-      @Override
-      public void onBannerFailed(AdError adError) {
-        Log.d(TAG, "Banner ad failed");
-        sendEventToDart("onBannerFailed", adError.getFullErrorInfo());
-      }
-
-      @Override
-      public void onBannerClicked(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Banner ad clicked");
-        sendEventToDart("onBannerClicked", tuAdInfo.getPlacementId());
-      }
-
-      @Override
-      public void onBannerShow(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Banner ad shown");
-        sendEventToDart("onBannerShow", tuAdInfo.getPlacementId());
-      }
-
-      @Override
-      public void onBannerClose(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Banner ad closed");
-        sendEventToDart("onBannerClose", tuAdInfo.getPlacementId());
-        if (bannerView.getParent() != null) {
-          ((ViewGroup) bannerView.getParent()).removeView(bannerView);
+      bannerView.setBannerAdListener(new TUBannerListener() {
+        @Override
+        public void onBannerLoaded() {
+          Log.d(TAG, "Banner ad loaded");
+          sendEventToDart("onBannerLoaded", null);
         }
+
+        @Override
+        public void onBannerFailed(AdError adError) {
+          Log.d(TAG, "Banner ad failed");
+          sendEventToDart("onBannerFailed", adError.getFullErrorInfo());
+        }
+
+        @Override
+        public void onBannerClicked(TUAdInfo tuAdInfo) {
+          Log.d(TAG, "Banner ad clicked");
+          sendEventToDart("onBannerClicked", tuAdInfo.getPlacementId());
+        }
+
+        @Override
+        public void onBannerShow(TUAdInfo tuAdInfo) {
+          Log.d(TAG, "Banner ad shown");
+          sendEventToDart("onBannerShow", tuAdInfo.getPlacementId());
+        }
+
+        @Override
+        public void onBannerClose(TUAdInfo tuAdInfo) {
+          Log.d(TAG, "Banner ad closed");
+          sendEventToDart("onBannerClose", tuAdInfo.getPlacementId());
+          if (bannerContainer != null) {
+            bannerContainer.setVisibility(View.GONE);
+          }
+        }
+
+        @Override
+        public void onBannerAutoRefreshed(TUAdInfo tuAdInfo) {
+          Log.d(TAG, "Banner ad auto refreshed");
+          sendEventToDart("onBannerAutoRefreshed", tuAdInfo.getPlacementId());
+        }
+
+        @Override
+        public void onBannerAutoRefreshFail(AdError adError) {
+          Log.d(TAG, "Banner ad auto refresh failed");
+          sendEventToDart("onBannerAutoRefreshFail", adError.getFullErrorInfo());
+        }
+      });
+    }
+
+    activity.runOnUiThread(()-> {
+      ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+
+      if (bannerContainer != null) {
+        decorView.removeView(bannerContainer);
       }
 
-      @Override
-      public void onBannerAutoRefreshed(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Banner ad auto refreshed");
-        sendEventToDart("onBannerAutoRefreshed", tuAdInfo.getPlacementId());
+      if(bannerView.getParent() != null){
+        ((ViewGroup) bannerView.getParent()).removeView(bannerView);
       }
 
-      @Override
-      public void onBannerAutoRefreshFail(AdError adError) {
-        Log.d(TAG, "Banner ad auto refresh failed");
-        sendEventToDart("onBannerAutoRefreshFail", adError.getFullErrorInfo());
+      bannerContainer = new FrameLayout(activity);
+      FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
+      );
+
+      if("top".equalsIgnoreCase(position)){
+        params.gravity = Gravity.TOP;
+      }else{
+        params.gravity = Gravity.BOTTOM;
       }
+
+      bannerContainer.setLayoutParams(params);
+      bannerContainer.addView(bannerView);
+      decorView.addView(bannerContainer);
+      bannerContainer.setVisibility(View.VISIBLE);
     });
 
     bannerView.loadAd();
     result.success(true);
   }
 
-  private void destroyBannerAd(Result result) {
-    if (bannerView != null) {
-      bannerView.destroy();
-      Log.d(TAG, "Banner ad destroyed");
-      bannerView = null;
-    }
-    result.success(true);
+  private void removeBannerAd(Result result) {
+    activity.runOnUiThread(() -> {
+      if (bannerContainer != null) {
+        ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+        decorView.removeView(bannerContainer);
+        bannerContainer = null;
+        Log.d(TAG, "Banner ad removed");
+      }
+
+      if (bannerView != null) {
+        if (bannerView.getParent() != null) {
+          ((ViewGroup) bannerView.getParent()).removeView(bannerView);
+        }
+        bannerView = null;
+      }
+
+      result.success(true);
+    });
   }
 
   private void loadNativeAd(MethodCall call, Result result) {
