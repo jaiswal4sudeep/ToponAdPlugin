@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.0.6] - 2025-04-25
+
+### 🐞 Fixed
+- Resolved `IllegalStateException: Reply already submitted` crash.
+- Ensured `MethodChannel.Result.success()` is called only once per method invocation.
+- Added guards (`pendingInterstitialResult`, `pendingRewardedResult`) to prevent multiple replies from asynchronous ad callbacks.
+
+---
+
 ## [0.0.5] - 2025-04-24
 
 ### 🔌 Added

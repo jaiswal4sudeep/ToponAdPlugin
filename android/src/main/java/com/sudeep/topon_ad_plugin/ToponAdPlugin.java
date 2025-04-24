@@ -47,6 +47,9 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private NativeAd nativeAd;
   private TURewardVideoAd rewardedVideoAd;
 
+  private Result pendingInterstitialResult;
+  private Result pendingRewardedResult;
+
   private static final String TAG = "ToponAdPlugin";
 
   @Override
@@ -97,6 +100,7 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void sendEventToDart(String method, Object arguments) {
     if (channel != null && activity != null) {
       activity.runOnUiThread(() -> channel.invokeMethod(method, arguments));
+      Log.d(TAG, "Event sent to Dart: " + method);
     }
   }
 
@@ -113,66 +117,147 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private void loadInterstitialAd(MethodCall call, Result result) {
     String placementId = call.argument("placementId");
 
+    if (pendingInterstitialResult != null) {
+      result.error("INTERSTITIAL_PENDING", "Interstitial ad is already loading or showing", null);
+      return;
+    }
+
+    pendingInterstitialResult = result;
+
     interstitialAd = new TUInterstitial(activity, placementId);
     interstitialAd.setAdListener(new TUInterstitialListener() {
       @Override
       public void onInterstitialAdLoaded() {
         Log.d(TAG, "Interstitial ad loaded");
         sendEventToDart("onInterstitialAdLoaded", null);
+        if (pendingInterstitialResult != null) {
+          pendingInterstitialResult.success(true);
+          pendingInterstitialResult = null;
+        }
       }
 
       @Override
       public void onInterstitialAdLoadFail(AdError adError) {
         Log.d(TAG, "Interstitial ad load failed");
         sendEventToDart("onInterstitialAdLoadFail", adError.getFullErrorInfo());
+        if (pendingInterstitialResult != null) {
+          pendingInterstitialResult.success(false);
+          pendingInterstitialResult = null;
+        }
       }
 
       @Override
-      public void onInterstitialAdClicked(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Interstitial ad clicked");
-        sendEventToDart("onInterstitialAdClicked", tuAdInfo.getPlacementId());
+      public void onInterstitialAdClicked(TUAdInfo info) {
+        sendEventToDart("onInterstitialAdClicked", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdShow(TUAdInfo info) {
-        Log.d(TAG, "Interstitial ad shown");
         sendEventToDart("onInterstitialAdShow", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdClose(TUAdInfo info) {
-        Log.d(TAG, "Interstitial ad closed");
         sendEventToDart("onInterstitialAdClose", info.getPlacementId());
-        loadInterstitialAd(call, result);
       }
 
       @Override
       public void onInterstitialAdVideoStart(TUAdInfo info) {
-        Log.d(TAG, "Interstitial ad video started");
         sendEventToDart("onInterstitialAdVideoStart", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdVideoEnd(TUAdInfo info) {
-        Log.d(TAG, "Interstitial ad video ended");
         sendEventToDart("onInterstitialAdVideoEnd", info.getPlacementId());
       }
 
       @Override
       public void onInterstitialAdVideoError(AdError adError) {
-        Log.d(TAG, "Interstitial ad video error");
         sendEventToDart("onInterstitialAdVideoError", adError.getFullErrorInfo());
       }
     });
 
     interstitialAd.load();
-    result.success(true);
   }
 
   private void showInterstitial(Result result) {
+    pendingInterstitialResult = null;
     if (interstitialAd != null && interstitialAd.isAdReady()) {
       interstitialAd.show(activity);
-      Log.d(TAG, "Interstitial ad shown");
+      result.success(true);
+    } else {
+      result.success(false);
+    }
+  }
+
+  private void loadRewardedAd(MethodCall call, Result result) {
+    String placementId = call.argument("placementId");
+
+    if (pendingRewardedResult != null) {
+      result.error("REWARDED_PENDING", "Rewarded ad is already loading or showing", null);
+      return;
+    }
+
+    pendingRewardedResult = result;
+
+    rewardedVideoAd = new TURewardVideoAd(activity, placementId);
+    rewardedVideoAd.setAdListener(new TURewardVideoListener() {
+      @Override
+      public void onRewardedVideoAdLoaded() {
+        sendEventToDart("onRewardedVideoAdLoaded", null);
+        if (pendingRewardedResult != null) {
+          pendingRewardedResult.success(true);
+          pendingRewardedResult = null;
+        }
+      }
+
+      @Override
+      public void onRewardedVideoAdFailed(AdError adError) {
+        sendEventToDart("onRewardedVideoAdFailed", adError.getFullErrorInfo());
+        if (pendingRewardedResult != null) {
+          pendingRewardedResult.success(false);
+          pendingRewardedResult = null;
+        }
+      }
+
+      @Override
+      public void onRewardedVideoAdPlayStart(TUAdInfo adInfo) {
+        sendEventToDart("onRewardedVideoAdPlayStart", adInfo.getPlacementId());
+      }
+
+      @Override
+      public void onRewardedVideoAdPlayEnd(TUAdInfo adInfo) {
+        sendEventToDart("onRewardedVideoAdPlayEnd", adInfo.getPlacementId());
+      }
+
+      @Override
+      public void onRewardedVideoAdPlayFailed(AdError adError, TUAdInfo adInfo) {
+        sendEventToDart("onRewardedVideoAdPlayFailed", adError.getFullErrorInfo());
+      }
+
+      @Override
+      public void onRewardedVideoAdClosed(TUAdInfo adInfo) {
+        sendEventToDart("onRewardedVideoAdClosed", adInfo.getPlacementId());
+      }
+
+      @Override
+      public void onRewardedVideoAdPlayClicked(TUAdInfo adInfo) {
+        sendEventToDart("onRewardedVideoAdPlayClicked", adInfo.getPlacementId());
+      }
+
+      @Override
+      public void onReward(TUAdInfo adInfo) {
+        sendEventToDart("onReward", adInfo.getPlacementId());
+      }
+    });
+
+    rewardedVideoAd.load();
+  }
+
+  private void showRewardedAd(Result result) {
+    pendingRewardedResult = null;
+    if (rewardedVideoAd != null && rewardedVideoAd.isAdReady()) {
+      rewardedVideoAd.show(activity);
       result.success(true);
     } else {
       result.success(false);
@@ -379,75 +464,6 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
       result.success(false);
     }
   }
-
-  private void loadRewardedAd(MethodCall call, Result result) {
-    String placementId = call.argument("placementId");
-
-    rewardedVideoAd = new TURewardVideoAd(activity, placementId);
-    rewardedVideoAd.setAdListener(new TURewardVideoListener() {
-      @Override
-      public void onRewardedVideoAdLoaded() {
-        Log.d(TAG, "Rewarded video ad loaded");
-        sendEventToDart("onRewardedVideoAdLoaded", null);
-      }
-
-      @Override
-      public void onRewardedVideoAdFailed(AdError adError) {
-        Log.d(TAG, "Rewarded video ad failed");
-        sendEventToDart("onRewardedVideoAdFailed", adError.getFullErrorInfo());
-      }
-
-      @Override
-      public void onRewardedVideoAdPlayStart(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded video ad play started");
-        sendEventToDart("onRewardedVideoAdPlayStart", adInfo.getPlacementId());
-      }
-
-      @Override
-      public void onRewardedVideoAdPlayEnd(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded video ad play ended");
-        sendEventToDart("onRewardedVideoAdPlayEnd", adInfo.getPlacementId());
-      }
-
-      @Override
-      public void onRewardedVideoAdPlayFailed(AdError adError, TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded video ad play failed");
-        sendEventToDart("onRewardedVideoAdPlayFailed", adError.getFullErrorInfo());
-      }
-
-      @Override
-      public void onRewardedVideoAdClosed(TUAdInfo adInfo) {
-        Log.d(TAG, "Rewarded video ad closed");
-        sendEventToDart("onRewardedVideoAdClosed", adInfo.getPlacementId());
-      }
-
-      @Override
-      public void onRewardedVideoAdPlayClicked(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Rewarded video ad play clicked");
-        sendEventToDart("onRewardedVideoAdPlayClicked", tuAdInfo.getPlacementId());
-      }
-
-      @Override
-      public void onReward(TUAdInfo tuAdInfo) {
-        Log.d(TAG, "Rewarded video ad rewarded");
-        sendEventToDart("onReward", tuAdInfo.getPlacementId());
-      }
-    });
-
-    rewardedVideoAd.load();
-    result.success(true);
-  }
-
-  private void showRewardedAd(Result result) {
-    if (rewardedVideoAd != null && rewardedVideoAd.isAdReady()) {
-      rewardedVideoAd.show(activity);
-      Log.d(TAG, "Rewarded video ad shown");
-      result.success(true);
-    } else {
-      result.success(false);
-    }
-  }
-
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     activity = binding.getActivity();
