@@ -4,7 +4,23 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [0.0.4] - 2025-04-20
+## [0.0.5] - 2025-04-24
+
+### 🔌 Added
+- Integrated multiple ad network adapters to enable full mediation support:
+  - ✅ AdMob
+  - ✅ Facebook (Meta Audience Network)
+  - ✅ UnityAds
+  - ✅ IronSource
+  - ✅ AppLovin
+  - ✅ Mintegral
+
+### 📦 Updated
+- Updated core TopOn SDK and related dependencies to version `6.4.80`.
+
+---
+
+## [0.0.4] - 2025-04-21
 
 ### 🛠️ Fixed
 - Resolved crash due to re-adding banner view (`IllegalStateException: The specified child already has a parent`).
