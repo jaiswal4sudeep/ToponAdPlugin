@@ -79,7 +79,7 @@ class ToponAdPlugin {
     }
   }
 
-  /// Loads a banner ad for the provided [placementId] at given [position].
+  /// Loads a banner ad for the provided [placementId] at the given [position].
   static Future<bool> loadBannerAd({
     required String placementId,
     required BannerPosition position,
@@ -114,12 +114,20 @@ class ToponAdPlugin {
     }
   }
 
-  /// Displays a previously loaded native ad.
-  static Future<bool> showNativeAd() async {
+  /// Retrieves information about the loaded native ad.
+  ///
+  /// Returns a [ToponNativeAdInfo] object if successful, otherwise `null`.
+  static Future<ToponNativeAdInfo?> getNativeAdInfo() async {
     try {
-      return await _channel.invokeMethod('showNativeAd');
+      final Map<dynamic, dynamic>? adInfoMap = await _channel.invokeMethod(
+        'getNativeAdInfo',
+      );
+      if (adInfoMap != null) {
+        return ToponNativeAdInfo.fromMap(adInfoMap.cast<String, dynamic>());
+      }
+      return null;
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
@@ -144,4 +152,73 @@ class ToponAdPlugin {
   }
 }
 
+/// Banner ad position.
 enum BannerPosition { top, bottom }
+
+/// A class representing the information of a loaded native ad from TopOn.
+class ToponNativeAdInfo {
+  final String title;
+  final String description;
+  final String iconUrl;
+  final String mainImageUrl;
+  final String callToAction;
+  final double? starRating;
+  final String adFrom;
+  final String adChoiceIconUrl;
+  final String videoUrl;
+  final double? appPrice;
+  final int? appCommentNum;
+  final String advertiserName;
+  final String adType;
+  final String domain;
+  final String warning;
+  final int? downloadStatus;
+  final int? downloadProgress;
+
+  ToponNativeAdInfo({
+    required this.title,
+    required this.description,
+    required this.iconUrl,
+    required this.mainImageUrl,
+    required this.callToAction,
+    this.starRating,
+    required this.adFrom,
+    required this.adChoiceIconUrl,
+    required this.videoUrl,
+    this.appPrice,
+    this.appCommentNum,
+    required this.advertiserName,
+    required this.adType,
+    required this.domain,
+    required this.warning,
+    this.downloadStatus,
+    this.downloadProgress,
+  });
+
+  /// Creates a [ToponNativeAdInfo] object from a map.
+  factory ToponNativeAdInfo.fromMap(Map<String, dynamic> map) {
+    return ToponNativeAdInfo(
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      iconUrl: map['iconUrl'] ?? '',
+      mainImageUrl: map['mainImageUrl'] ?? '',
+      callToAction: map['callToAction'] ?? '',
+      starRating:
+          map['starRating'] != null
+              ? (map['starRating'] as num).toDouble()
+              : null,
+      adFrom: map['adFrom'] ?? '',
+      adChoiceIconUrl: map['adChoiceIconUrl'] ?? '',
+      videoUrl: map['videoUrl'] ?? '',
+      appPrice:
+          map['appPrice'] != null ? (map['appPrice'] as num).toDouble() : null,
+      appCommentNum: map['appCommentNum'],
+      advertiserName: map['advertiserName'] ?? '',
+      adType: map['adType'] ?? '',
+      domain: map['domain'] ?? '',
+      warning: map['warning'] ?? '',
+      downloadStatus: map['downloadStatus'],
+      downloadProgress: map['downloadProgress'],
+    );
+  }
+}

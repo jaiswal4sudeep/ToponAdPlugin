@@ -11,7 +11,7 @@ mixin ToponAdHelper {
   final String nativeId = '<NATIVE_PLACEMENT_ID>';
 
   Future<String> initializeTopon() async {
-    final result = await ToponAdPlugin.initializeSdk(
+    final bool result = await ToponAdPlugin.initializeSdk(
       appId: appId,
       appKey: appKey,
     );
@@ -19,24 +19,24 @@ mixin ToponAdHelper {
   }
 
   Future<String> loadInterstitial() async {
-    final result = await ToponAdPlugin.loadInterstitialAd(
+    final bool result = await ToponAdPlugin.loadInterstitialAd(
       placementId: interstitialId,
     );
     return result ? 'Interstitial Ad Loaded' : 'Interstitial Ad Load Failed';
   }
 
   Future<String> showInterstitial() async {
-    final result = await ToponAdPlugin.showInterstitialAd();
+    final bool result = await ToponAdPlugin.showInterstitialAd();
     return result ? 'Interstitial Ad Shown' : 'Interstitial Ad Show Failed';
   }
 
   Future<String> loadSplash() async {
-    final result = await ToponAdPlugin.loadSplashAd(placementId: splashId);
+    final bool result = await ToponAdPlugin.loadSplashAd(placementId: splashId);
     return result ? 'Splash Ad Loaded' : 'Splash Ad Load Failed';
   }
 
   Future<String> loadBanner() async {
-    final result = await ToponAdPlugin.loadBannerAd(
+    final bool result = await ToponAdPlugin.loadBannerAd(
       placementId: bannerId,
       position: BannerPosition.bottom,
     );
@@ -44,27 +44,28 @@ mixin ToponAdHelper {
   }
 
   Future<String> removeBanner() async {
-    final result = await ToponAdPlugin.removeBannerAd();
+    final bool result = await ToponAdPlugin.removeBannerAd();
     return result ? 'Banner Ad removed' : 'Banner Ad Remove Failed';
   }
 
   Future<String> loadNative() async {
-    final result = await ToponAdPlugin.loadNativeAd(placementId: nativeId);
+    final bool result = await ToponAdPlugin.loadNativeAd(placementId: nativeId);
     return result ? 'Native Ad Loaded' : 'Native Ad Load Failed';
   }
 
-  Future<String> showNative() async {
-    final result = await ToponAdPlugin.showNativeAd();
-    return result ? 'Native Ad Shown' : 'Native Ad Show Failed';
+  Future<ToponNativeAdInfo?> getNativeAdInfo() async {
+    return await ToponAdPlugin.getNativeAdInfo();
   }
 
   Future<String> loadRewarded() async {
-    final result = await ToponAdPlugin.loadRewardedAd(placementId: rewardedId);
+    final bool result = await ToponAdPlugin.loadRewardedAd(
+      placementId: rewardedId,
+    );
     return result ? 'Rewarded Ad Loaded' : 'Rewarded Ad Load Failed';
   }
 
   Future<String> showRewarded() async {
-    final result = await ToponAdPlugin.showRewardedAd();
+    final bool result = await ToponAdPlugin.showRewardedAd();
     return result ? 'Rewarded Ad Shown' : 'Rewarded Ad Show Failed';
   }
 }

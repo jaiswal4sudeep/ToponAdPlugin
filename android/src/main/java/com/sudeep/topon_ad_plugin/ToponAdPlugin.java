@@ -15,6 +15,10 @@ import com.thinkup.banner.api.TUBannerView;
 import com.thinkup.core.api.TUAdInfo;
 import com.thinkup.core.api.AdError;
 import com.thinkup.core.api.TUSDK;
+import com.thinkup.nativead.api.TUNativeAdView;
+import com.thinkup.nativead.api.TUNativeDislikeListener;
+import com.thinkup.nativead.api.TUNativeEventListener;
+import com.thinkup.nativead.api.TUNativeMaterial;
 import com.thinkup.rewardvideo.api.TURewardVideoAd;
 import com.thinkup.rewardvideo.api.TURewardVideoListener;
 import com.thinkup.interstitial.api.TUInterstitial;
@@ -26,6 +30,7 @@ import com.thinkup.splashad.api.TUSplashAd;
 import com.thinkup.splashad.api.TUSplashAdEZListener;
 import com.thinkup.splashad.api.TUSplashAdExtraInfo;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -83,8 +88,8 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
       case "loadNativeAd":
         loadNativeAd(call, result);
         break;
-      case "showNativeAd":
-        showNativeAd(result);
+      case "getNativeAdInfo":
+        getNativeAdInfo(result);
         break;
       case "loadRewardedAd":
         loadRewardedAd(call, result);
@@ -454,16 +459,75 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     result.success(true);
   }
 
-  private void showNativeAd(Result result) {
-    nativeAd = tuNative.getNativeAd();
-    if (nativeAd != null && nativeAd.isNativeExpress()) {
-      Log.d(TAG, "Native ad shown");
-      sendEventToDart("onNativeAdReadyToShow", nativeAd.getAdInfo().getPlacementId());
-      result.success(true);
+  private void getNativeAdInfo(Result result) {
+    nativeAd = tuNative != null ? tuNative.getNativeAd() : null;
+
+    if (nativeAd != null && nativeAd.getAdMaterial() != null) {
+      TUNativeMaterial material = (TUNativeMaterial) nativeAd.getAdMaterial();
+      Map<String, Object> adInfo = buildAdInfo(material);
+
+      nativeAd.setNativeEventListener(new TUNativeEventListener() {
+        @Override
+        public void onAdImpressed(TUNativeAdView tuNativeAdView, TUAdInfo tuAdInfo) {
+          sendEventToDart("onAdImpressed", tuAdInfo.getPlacementId());
+        }
+
+        @Override
+        public void onAdClicked(TUNativeAdView tuNativeAdView, TUAdInfo tuAdInfo) {
+          sendEventToDart("onAdClicked", tuAdInfo.getPlacementId());
+        }
+
+        @Override
+        public void onAdVideoStart(TUNativeAdView tuNativeAdView) {
+          sendEventToDart("onAdVideoStart", null);
+        }
+
+        @Override
+        public void onAdVideoEnd(TUNativeAdView tuNativeAdView) {
+          sendEventToDart("onAdVideoEnd", null);
+        }
+
+        @Override
+        public void onAdVideoProgress(TUNativeAdView tuNativeAdView, int i) {
+          sendEventToDart("onAdVideoProgress", i);
+        }
+      });
+
+      nativeAd.setDislikeCallbackListener(new TUNativeDislikeListener() {
+        @Override
+        public void onAdCloseButtonClick(TUNativeAdView tuNativeAdView, TUAdInfo tuAdInfo) {
+          sendEventToDart("onAdCloseButtonClick", tuAdInfo.getPlacementId());
+        }
+      });
+
+      result.success(adInfo);
     } else {
-      result.success(false);
+      result.error("NATIVE_AD_NOT_READY", "Native ad not loaded yet", null);
     }
   }
+
+  private Map<String, Object> buildAdInfo(TUNativeMaterial material) {
+    Map<String, Object> adInfo = new HashMap<>();
+    adInfo.put("title", material.getTitle());
+    adInfo.put("description", material.getDescriptionText());
+    adInfo.put("mainImageUrl", material.getMainImageUrl());
+    adInfo.put("iconUrl", material.getIconImageUrl());
+    adInfo.put("callToAction", material.getCallToActionText());
+    adInfo.put("starRating", material.getStarRating());
+    adInfo.put("adFrom", material.getAdFrom());
+    adInfo.put("adChoiceIconUrl", material.getAdChoiceIconUrl());
+    adInfo.put("videoUrl", material.getVideoUrl());
+    adInfo.put("appPrice", material.getAppPrice());
+    adInfo.put("appCommentNum", material.getAppCommentNum());
+    adInfo.put("advertiserName", material.getAdvertiserName());
+    adInfo.put("adType", material.getAdType());
+    adInfo.put("domain", material.getDomain());
+    adInfo.put("warning", material.getWarning());
+    adInfo.put("downloadStatus", material.getDownloadStatus());
+    adInfo.put("downloadProgress", material.getDownloadProgress());
+    return adInfo;
+  }
+
   @Override
   public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
     activity = binding.getActivity();

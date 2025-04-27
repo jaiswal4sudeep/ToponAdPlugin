@@ -1,6 +1,20 @@
+
 # 📄 Changelog
 
 All notable changes to this project will be documented in this file.
+
+---
+
+## [0.0.7] - 2025-04-27
+
+### 🔥 Major Changes
+- Replaced `showNativeAd()` with `getNativeAdInfo()` method for better self-rendered native ad control.
+- Introduced `ToponNativeAdInfo` Dart class for strongly-typed native ad information.
+- Added full native ad lifecycle event listeners (Impression, Click, Close, Video Start, Video End).
+
+### 🛠️ Improvements
+- Cleaned up Flutter plugin code with better documentation and null safety.
+- Updated `README.md` to match new native ad integration flow.
 
 ---
 
