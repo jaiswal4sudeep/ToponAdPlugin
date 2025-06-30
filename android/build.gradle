@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.7.3")
+        classpath("com.android.tools.build:gradle:8.11.0")
     }
 }
 
@@ -33,7 +33,7 @@ apply plugin: "com.android.library"
 
 android {
     namespace = "com.sudeep.topon_ad_plugin"
-    compileSdk = 35
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -65,37 +65,41 @@ dependencies {
     api "com.thinkup.sdk:splash-tpn:6.4.80"
 
     // ✅ AndroidX Essentials
-    api "androidx.appcompat:appcompat:1.6.1"
-    api "androidx.browser:browser:1.4.0"
+    api "androidx.appcompat:appcompat:1.7.1"
+    api "androidx.browser:browser:1.8.0"
 
     // ✅ Unity Ads
     api "com.thinkup.sdk:adapter-tpn-unityads:6.4.80"
-    api "com.unity3d.ads:unity-ads:4.14.0"
+    api "com.unity3d.ads:unity-ads:4.15.0"
 
     // ✅ IronSource
     api "com.thinkup.sdk:adapter-tpn-ironsource:6.4.80"
-    api "com.ironsource.sdk:mediationsdk:8.7.0"
-    api "com.google.android.gms:play-services-appset:16.0.2"
-    api "com.google.android.gms:play-services-ads-identifier:18.0.1"
-    api "com.google.android.gms:play-services-basement:18.1.0"
+    api "com.ironsource.sdk:mediationsdk:8.9.1"
+    api "com.google.android.gms:play-services-appset:16.1.0"
+
+    // ✅ Vungle
+    api "com.thinkup.sdk:adapter-tpn-vungle:6.4.90"
+    api "com.vungle:vungle-ads:7.5.0"
+    api "com.google.android.gms:play-services-basement:18.7.0"
+    api "com.google.android.gms:play-services-ads-identifier:18.2.0"
 
     // ✅ Facebook Audience Network
     api "com.thinkup.sdk:adapter-tpn-facebook:6.4.80"
-    api "com.facebook.android:audience-network-sdk:6.19.0"
-    api "androidx.annotation:annotation:1.0.0"
+    api "com.facebook.android:audience-network-sdk:6.20.0"
+    api "androidx.annotation:annotation:1.9.1"
 
     // ✅ AdMob
     api "com.thinkup.sdk:adapter-tpn-admob:6.4.80"
-    api "com.google.android.gms:play-services-ads:24.0.0"
+    api "com.google.android.gms:play-services-ads:24.4.0"
 
     // ✅ AppLovin
     api "com.thinkup.sdk:adapter-tpn-applovin:6.4.80"
-    api "com.applovin:applovin-sdk:13.2.0"
+    api "com.applovin:applovin-sdk:13.3.1"
 
     // ✅ Mintegral
     api "com.thinkup.sdk:adapter-tpn-mintegral:6.4.80"
     api "com.mbridge.msdk.oversea:mbridge_android_sdk:16.9.11"
-    api "androidx.recyclerview:recyclerview:1.1.0"
+    api "androidx.recyclerview:recyclerview:1.4.0"
 
     // ✅ Tramini Plugin (Optional Analytics Plugin from TopOn)
     api "com.thinkup.sdk:tramini-plugin-tpn:6.4.80"
