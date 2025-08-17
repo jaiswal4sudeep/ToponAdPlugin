@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+[0.0.9] - 2025-08-17
+### 🚀 Updates
+
+- Upgraded all integrated Ad SDKs to their latest stable versions for enhanced performance and compatibility:
+  - ✅ **TopOn SDK** upgraded
+  - ✅ **AdMob Adapter** updated
+  - ✅ **Facebook (Meta Audience Network) Adapter** updated
+  - ✅ **UnityAds Adapter** updated
+  - ✅ **IronSource Adapter** updated
+  - ✅ **AppLovin Adapter** updated
+  - ✅ **Mintegral Adapter** updated
+  - ✅ **Vungle Adapter** updated
+
+---
+
 ## [0.0.8] - 2025-06-30
 
 ### 🚀 Updates
