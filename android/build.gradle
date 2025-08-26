@@ -9,7 +9,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.12.0")
+        classpath("com.android.tools.build:gradle:8.12.1")
     }
 }
 
@@ -100,4 +100,8 @@ dependencies {
     api "com.thinkup.sdk:adapter-tpn-mintegral:6.5.10"
     api "com.mbridge.msdk.oversea:mbridge_android_sdk:16.9.71"
     api "androidx.recyclerview:recyclerview:1.4.0"
+
+    //Inmobi
+    api "com.thinkup.sdk:adapter-tpn-inmobi:6.5.10"
+    api "com.inmobi.monetization:inmobi-ads-kotlin:10.8.7"
 }

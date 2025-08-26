@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+[0.0.10] - 2025-09-26
+### 🔌 Added
+
+- Added support for **InMobi** ad network adapter to enhance mediation capabilities.
+
+### 🛠️ Updates
+
+- Upgraded all integrated Ad SDKs to their latest stable versions for improved performance and compatibility.
+
+---
+
 [0.0.9] - 2025-08-17
 ### 🚀 Updates
 
