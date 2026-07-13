@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+[0.0.12] - 2026-07-13
+### 🛠️ Updates
+
+- Upgraded all integrated Ad SDKs to their latest stable versions for improved performance and compatibility.
+
+---
+
 [0.0.11] - 2026-07-13
 ### 🛠️ Updates
 
