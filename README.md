@@ -13,6 +13,7 @@ This plugin provides simple methods to initialize the SDK and display **Intersti
 - ✅ Initialize TopOn SDK  
 - ✅ Load & Show Interstitial Ads  
 - ✅ Load & Show Rewarded Ads  
+- ✅ Server-to-server (S2S) rewarded postback data
 - ✅ Load Native Ads and render custom Flutter widgets  
 - ✅ Load Banner Ads  
 - ✅ Load Splash Ads  
@@ -83,9 +84,59 @@ final shown = await ToponAdPlugin.showInterstitialAd();
 ### 3️⃣ Rewarded Ads
 
 ```dart
-await ToponAdPlugin.loadRewardedAd(placementId: 'your_rewarded_id');
+await ToponAdPlugin.loadRewardedAd(
+  placementId: 'your_rewarded_id',
+  userId: currentUser.id, // Your backend's stable user ID
+  customData: rewardTransactionId, // Optional opaque value
+);
 final shown = await ToponAdPlugin.showRewardedAd();
 ```
+
+### Rewarded S2S postbacks
+
+Enable and configure the rewarded-video server callback URL for the placement
+in the TopOn dashboard. The plugin passes `userId` and `customData` to the
+TopOn SDK; TopOn then includes them in the postback to your backend.
+
+See the example app's [S2S backend setup](example/S2S_BACKEND_SETUP.md) for the
+complete callback URL, signature verification formula, response codes, and
+reward-processing checklist.
+
+You can set the values separately when the user signs in:
+
+```dart
+await ToponAdPlugin.setRewardedS2SData(
+  userId: currentUser.id,
+  customData: rewardTransactionId,
+);
+
+// S2S data is attached to the ad at load time.
+await ToponAdPlugin.loadRewardedAd(placementId: 'your_rewarded_id');
+await ToponAdPlugin.showRewardedAd();
+
+// Prevent one user's data being reused after logout.
+await ToponAdPlugin.clearRewardedS2SData();
+```
+
+Changing or clearing S2S data invalidates an already-loaded rewarded ad. Load a
+new ad afterward; this prevents cached reward metadata crossing user sessions.
+
+Display-time custom data can be sent separately using TopOn's
+`show_custom_ext` field:
+
+```dart
+await ToponAdPlugin.showRewardedAd(
+  showCustomData: rewardTransactionId,
+);
+```
+
+For display-time data, add `&ilrd={ilrd}` to the callback URL configured in the
+TopOn dashboard and parse `show_custom_ext` from the returned `ilrd` payload.
+The stable `userId` must still be supplied before loading the ad.
+
+Your backend should verify TopOn's callback signature and process each callback
+idempotently (for example, using the callback transaction ID) before crediting
+the reward. Do not put secrets in `customData`; it originates on the client.
 
 ---
 

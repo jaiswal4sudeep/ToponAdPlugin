@@ -13,7 +13,9 @@ import androidx.annotation.NonNull;
 import com.thinkup.banner.api.TUBannerListener;
 import com.thinkup.banner.api.TUBannerView;
 import com.thinkup.core.api.TUAdInfo;
+import com.thinkup.core.api.TUAdConst;
 import com.thinkup.core.api.AdError;
+import com.thinkup.core.api.TUShowConfig;
 import com.thinkup.core.api.TUSDK;
 import com.thinkup.nativead.api.TUNativeAdView;
 import com.thinkup.nativead.api.TUNativeDislikeListener;
@@ -51,6 +53,8 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
   private TUNative tuNative;
   private NativeAd nativeAd;
   private TURewardVideoAd rewardedVideoAd;
+  private String rewardedS2SUserId;
+  private String rewardedS2SCustomData = "";
 
   private Result pendingInterstitialResult;
   private Result pendingRewardedResult;
@@ -94,8 +98,14 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
       case "loadRewardedAd":
         loadRewardedAd(call, result);
         break;
+      case "setRewardedS2SData":
+        setRewardedS2SData(call, result);
+        break;
+      case "clearRewardedS2SData":
+        clearRewardedS2SData(result);
+        break;
       case "showRewardedAd":
-        showRewardedAd(result);
+        showRewardedAd(call, result);
         break;
       default:
         result.notImplemented();
@@ -203,9 +213,15 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
       return;
     }
 
+    if (!updateRewardedS2SDataFromCall(call, result)) {
+      return;
+    }
+
     pendingRewardedResult = result;
 
+    destroyRewardedAd();
     rewardedVideoAd = new TURewardVideoAd(activity, placementId);
+    applyRewardedS2SData();
     rewardedVideoAd.setAdListener(new TURewardVideoListener() {
       @Override
       public void onRewardedVideoAdLoaded() {
@@ -259,10 +275,89 @@ public class ToponAdPlugin implements FlutterPlugin, MethodChannel.MethodCallHan
     rewardedVideoAd.load();
   }
 
-  private void showRewardedAd(Result result) {
+  private void setRewardedS2SData(MethodCall call, Result result) {
+    if (pendingRewardedResult != null) {
+      result.error("REWARDED_PENDING", "Cannot change S2S data while a rewarded ad is loading", null);
+      return;
+    }
+
+    String userId = call.argument("userId");
+    String customData = call.argument("customData");
+
+    if (userId == null || userId.trim().isEmpty()) {
+      result.error("INVALID_USER_ID", "userId must not be empty", null);
+      return;
+    }
+
+    String newCustomData = customData == null ? "" : customData;
+    boolean dataChanged = !userId.equals(rewardedS2SUserId)
+            || !newCustomData.equals(rewardedS2SCustomData);
+    if (dataChanged) {
+      destroyRewardedAd();
+    }
+
+    rewardedS2SUserId = userId;
+    rewardedS2SCustomData = newCustomData;
+    result.success(true);
+  }
+
+  private void clearRewardedS2SData(Result result) {
+    if (pendingRewardedResult != null) {
+      result.error("REWARDED_PENDING", "Cannot clear S2S data while a rewarded ad is loading", null);
+      return;
+    }
+
+    destroyRewardedAd();
+    rewardedS2SUserId = null;
+    rewardedS2SCustomData = "";
+    result.success(true);
+  }
+
+  private boolean updateRewardedS2SDataFromCall(MethodCall call, Result result) {
+    if (!call.hasArgument("userId") && !call.hasArgument("customData")) {
+      return true;
+    }
+
+    String userId = call.argument("userId");
+    if (userId == null || userId.trim().isEmpty()) {
+      result.error("INVALID_USER_ID", "userId is required when setting rewarded S2S data", null);
+      return false;
+    }
+
+    String customData = call.argument("customData");
+    rewardedS2SUserId = userId;
+    rewardedS2SCustomData = customData == null ? "" : customData;
+    return true;
+  }
+
+  private void applyRewardedS2SData() {
+    if (rewardedVideoAd != null && rewardedS2SUserId != null) {
+      Map<String, Object> localExtra = new HashMap<>();
+      localExtra.put(TUAdConst.KEY.USER_ID, rewardedS2SUserId);
+      localExtra.put(TUAdConst.KEY.USER_CUSTOM_DATA, rewardedS2SCustomData);
+      rewardedVideoAd.setLocalExtra(localExtra);
+    }
+  }
+
+  private void destroyRewardedAd() {
+    if (rewardedVideoAd != null) {
+      rewardedVideoAd.destroyAd();
+      rewardedVideoAd = null;
+    }
+  }
+
+  private void showRewardedAd(MethodCall call, Result result) {
     pendingRewardedResult = null;
     if (rewardedVideoAd != null && rewardedVideoAd.isAdReady()) {
-      rewardedVideoAd.show(activity);
+      String showCustomData = call.argument("showCustomData");
+      if (showCustomData == null) {
+        rewardedVideoAd.show(activity);
+      } else {
+        TUShowConfig showConfig = new TUShowConfig.Builder()
+                .showCustomExt(showCustomData)
+                .build();
+        rewardedVideoAd.show(activity, showConfig);
+      }
       result.success(true);
     } else {
       result.success(false);

@@ -20,6 +20,13 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with ToponAdHelper {
   String status = '';
   ToponNativeAdInfo? adInfo;
+  final TextEditingController _userIdController = TextEditingController(
+    text: 'demo-user-123',
+  );
+  late final TextEditingController _rewardTransactionController;
+
+  String _newRewardTransactionId() =>
+      'reward-${DateTime.now().microsecondsSinceEpoch}';
 
   void updateStatus(Future<String> Function() action) async {
     final String result = await action();
@@ -38,11 +45,29 @@ class _MyAppState extends State<MyApp> with ToponAdHelper {
 
   @override
   void initState() {
+    super.initState();
+    _rewardTransactionController = TextEditingController(
+      text: _newRewardTransactionId(),
+    );
     ToponAdPlugin.setUpListeners();
     ToponAdPlugin.onEvent = (method, args) {
       log('TopOn Event: $method | Args: $args');
+      if (method == 'onReward' && mounted) {
+        setState(() {
+          status =
+              'Client reward event received. Credit only after your '
+              'backend verifies the S2S callback.';
+        });
+      }
     };
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    ToponAdPlugin.onEvent = null;
+    _userIdController.dispose();
+    _rewardTransactionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,13 +93,79 @@ class _MyAppState extends State<MyApp> with ToponAdHelper {
                   onPressed: () => updateStatus(showInterstitial),
                   child: const Text('Show Interstitial'),
                 ),
-                ElevatedButton(
-                  onPressed: () => updateStatus(loadRewarded),
-                  child: const Text('Load Rewarded'),
-                ),
-                ElevatedButton(
-                  onPressed: () => updateStatus(showRewarded),
-                  child: const Text('Show Rewarded'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        spacing: 12,
+                        children: [
+                          const Text(
+                            'Rewarded S2S example',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextField(
+                            controller: _userIdController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Backend user ID',
+                            ),
+                          ),
+                          TextField(
+                            controller: _rewardTransactionController,
+                            decoration: InputDecoration(
+                              border: const OutlineInputBorder(),
+                              labelText: 'Client reward reference',
+                              suffixIcon: IconButton(
+                                tooltip: 'Generate new reference',
+                                onPressed: () {
+                                  _rewardTransactionController.text =
+                                      _newRewardTransactionId();
+                                },
+                                icon: const Icon(Icons.refresh),
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed:
+                                () => updateStatus(
+                                  () => loadRewardedS2S(
+                                    userId: _userIdController.text.trim(),
+                                    rewardTransactionId:
+                                        _rewardTransactionController.text
+                                            .trim(),
+                                  ),
+                                ),
+                            child: const Text('Load Rewarded with S2S Data'),
+                          ),
+                          ElevatedButton(
+                            onPressed:
+                                () => updateStatus(
+                                  () => showRewardedS2S(
+                                    rewardTransactionId:
+                                        _rewardTransactionController.text
+                                            .trim(),
+                                  ),
+                                ),
+                            child: const Text('Show Rewarded'),
+                          ),
+                          TextButton(
+                            onPressed: () => updateStatus(clearRewardedS2S),
+                            child: const Text('Clear S2S Data'),
+                          ),
+                          const Text(
+                            'Do not credit from the client onReward event. '
+                            'Wait for the verified backend callback.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () => updateStatus(loadBanner),

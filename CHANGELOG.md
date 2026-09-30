@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.0.13] - 2026-09-30
+
+- Added rewarded-ad S2S postback metadata support (`userId` and `customData`).
+- Added APIs to set and clear rewarded S2S data safely across login changes.
+- Rewarded S2S data can be supplied while loading; display-time custom data is
+  supported through TopOn's `show_custom_ext` field.
+
+---
+
 [0.0.12] - 2026-07-13
 ### 🛠️ Updates
 

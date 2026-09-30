@@ -132,20 +132,70 @@ class ToponAdPlugin {
   }
 
   /// Loads a rewarded video ad for the provided [placementId].
-  static Future<bool> loadRewardedAd({required String placementId}) async {
+  ///
+  /// When TopOn server-side rewards are enabled for the placement, pass the
+  /// authenticated backend [userId] and optional opaque [customData]. TopOn
+  /// includes these values in the reward postback sent to your backend.
+  static Future<bool> loadRewardedAd({
+    required String placementId,
+    String? userId,
+    String? customData,
+  }) async {
     try {
       return await _channel.invokeMethod('loadRewardedAd', {
         'placementId': placementId,
+        if (userId != null) 'userId': userId,
+        if (customData != null) 'customData': customData,
       });
     } catch (e) {
       return false;
     }
   }
 
-  /// Shows a previously loaded rewarded video ad.
-  static Future<bool> showRewardedAd() async {
+  /// Stores the data TopOn will attach to rewarded-ad S2S postbacks.
+  ///
+  /// Call this before loading the rewarded ad, and call it again whenever the
+  /// signed-in user changes. The data is bound to the ad during loading. Use
+  /// [clearRewardedS2SData] on logout so data cannot leak into a later user's
+  /// reward. Passing the values directly to [loadRewardedAd] is also supported.
+  /// Changing these values invalidates any loaded rewarded ad; load it again.
+  static Future<bool> setRewardedS2SData({
+    required String userId,
+    String customData = '',
+  }) async {
+    if (userId.trim().isEmpty) {
+      return false;
+    }
+
     try {
-      return await _channel.invokeMethod('showRewardedAd');
+      return await _channel.invokeMethod('setRewardedS2SData', {
+        'userId': userId,
+        'customData': customData,
+      });
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Clears stored S2S data and invalidates any loaded rewarded ad.
+  static Future<bool> clearRewardedS2SData() async {
+    try {
+      return await _channel.invokeMethod('clearRewardedS2SData');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Shows a previously loaded rewarded video ad.
+  ///
+  /// [showCustomData] is display-time data sent through TopOn's
+  /// `show_custom_ext` callback field. To receive it, include `&ilrd={ilrd}` in
+  /// the TopOn dashboard callback URL and parse `show_custom_ext` from `ilrd`.
+  static Future<bool> showRewardedAd({String? showCustomData}) async {
+    try {
+      return await _channel.invokeMethod('showRewardedAd', {
+        if (showCustomData != null) 'showCustomData': showCustomData,
+      });
     } catch (e) {
       return false;
     }
