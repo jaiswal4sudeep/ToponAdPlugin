@@ -1,0 +1,37 @@
+PODS:
+  - AnyThinkiOS (6.6.11):
+    - AnyThinkiOS/AnyThinkSDK (= 6.6.11)
+  - AnyThinkiOS/AnyThinkSDK (6.6.11)
+  - Flutter (1.0.0)
+  - integration_test (0.0.1):
+    - Flutter
+  - topon_ad_plugin (0.0.13):
+    - AnyThinkiOS
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - topon_ad_plugin (from `.symlinks/plugins/topon_ad_plugin/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AnyThinkiOS
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  integration_test:
+    :path: ".symlinks/plugins/integration_test/ios"
+  topon_ad_plugin:
+    :path: ".symlinks/plugins/topon_ad_plugin/ios"
+
+SPEC CHECKSUMS:
+  AnyThinkiOS: f42804833852d15ee65719d109eece75b5725952
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
+  topon_ad_plugin: 4a2457ebf9655fe888a3a7fbbbe30f0ea3d4c789
+
+PODFILE CHECKSUM: a1b77ab2eed1ecfad99c216e83309b9c45dc7534
+
+COCOAPODS: 1.17.0

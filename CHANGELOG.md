@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [0.0.14] - 2026-10-31
+
+### 🍎 Added
+- **Full iOS Platform Support**: Integrated native iOS support via TopOn (AnyThink) SDK with complete feature parity to Android.
+  - Added native Objective-C implementation (`ToponAdPlugin.h`, `ToponAdPlugin.m`) and CocoaPods specification (`topon_ad_plugin.podspec`).
+  - Added support for all ad formats on iOS:
+    - **Interstitial Ads** (`loadInterstitialAd`, `showInterstitial`)
+    - **Rewarded Video Ads** (`loadRewardedAd`, `showRewardedAd`) with Server-to-Server (S2S) verification data (`userId`, `customData`) and display-time custom data (`showCustomData`)
+    - **Banner Ads** (`loadBannerAd`, `removeBannerAd`) with safe area layout constraints and top/bottom positioning
+    - **Native Ads (Self-Rendering)** (`loadNativeAd`, `getNativeAdInfo`) mapping all asset fields to `ToponNativeAdInfo`
+    - **Splash Ads** (`loadSplashAd`) with auto-display on readiness
+  - Implemented decoupled delegate listeners for each ad format (`ToponInterstitialDelegate`, `ToponRewardedVideoDelegate`, `ToponBannerDelegate`, `ToponSplashDelegate`, `ToponNativeDelegate`) to prevent callback collisions.
+
+### 📚 Documentation & Examples
+- Added comprehensive [IOS_SETUP_GUIDE.md](IOS_SETUP_GUIDE.md) covering CocoaPods adapter configuration (AdMob, Meta, Vungle, InMobi, etc.), `Info.plist` keys (ATT, ATS, SKAdNetworkItems), App Tracking Transparency authorization flow, and troubleshooting.
+- Updated `README.md` with iOS setup instructions.
+- Added iOS runner setup and platform-aware helper getters to the example project.
+
+---
+
 ## [0.0.13] - 2026-09-30
 
 - Added rewarded-ad S2S postback metadata support (`userId` and `customData`).

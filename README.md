@@ -40,10 +40,51 @@ dependencies:
 Follow the official TopOn [Android integration guide](https://docs.toponad.com/#/en-us/android/stepbystep).
 
 2. **Update your `AndroidManifest.xml`**:
-   - Add necessary permissions
+   - Add necessary permissions (`INTERNET`, `ACCESS_NETWORK_STATE`, etc.)
    - Include required meta-data tags from TopOn
 
-3. **Add Proguard Rules** (if using Proguard)
+3. **Add Proguard Rules** (if using Proguard / R8)
+
+---
+
+## 🍎 iOS Setup
+
+Detailed guide with complete examples: 👉 **[IOS_SETUP_GUIDE.md](IOS_SETUP_GUIDE.md)**
+
+1. **Minimum Target:** iOS 12.0+
+2. **Configure `ios/Podfile`:**
+   Add required network adapters in your Flutter project's `ios/Podfile`:
+   ```ruby
+   target 'Runner' do
+     use_frameworks!
+     use_modular_headers!
+
+     flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+     # TopOn Adapters (Add what your mediation waterfall needs):
+     pod 'AnyThinkiOS/AnyThinkAdmobAdapter'
+     pod 'AnyThinkiOS/AnyThinkFacebookAdapter'
+     pod 'AnyThinkiOS/AnyThinkVungleAdapter'
+     pod 'AnyThinkiOS/AnyThinkInmobiAdapter'
+   end
+
+   post_install do |installer|
+     installer.pods_project.targets.each do |target|
+       flutter_additional_ios_build_settings(target)
+       target.build_configurations.each do |config|
+         config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)', '-ObjC']
+       end
+     end
+   end
+   ```
+3. **Configure `ios/Runner/Info.plist`:**
+   - **App Tracking Transparency (ATT):** Add `NSUserTrackingUsageDescription`
+   - **App Transport Security (ATS):** Add `NSAllowsArbitraryLoads = true`
+   - **SKAdNetwork:** Add `SKAdNetworkItems` for attribution tracking (see [IOS_SETUP_GUIDE.md](IOS_SETUP_GUIDE.md)).
+4. **Install Pods:**
+   ```bash
+   cd ios && pod install --repo-update && cd ..
+   ```
 
 ---
 
